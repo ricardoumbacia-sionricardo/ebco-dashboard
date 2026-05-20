@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard O&M Solar — EBCO Energía</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F4F0;min-height:100vh}
+.wrap{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sb{width:200px;flex-shrink:0;background:#1A3D28;display:flex;flex-direction:column}
+.sb-top{padding:1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logos{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sb-logos img{height:22px;width:auto;object-fit:contain;filter:brightness(0) invert(1);opacity:.9}
+.sb-logos-div{width:1px;height:18px;background:rgba(255,255,255,.2)}
+.sb-park{font-size:12px;font-weight:600;color:#fff;margin-bottom:2px}
+.sb-mw{font-size:10px;color:rgba(255,255,255,.5)}
+.sb-sec{padding:.75rem 1rem .2rem;font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.sb-it{display:flex;align-items:center;gap:9px;padding:.48rem 1rem;font-size:11px;color:rgba(255,255,255,.55);cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sb-it:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
+.sb-it.on{color:#fff;background:rgba(255,255,255,.1);border-left-color:#4CAF50;font-weight:500}
+.sb-it i{font-size:15px}
+.sb-badge{margin-left:auto;background:#E53E3E;color:#fff;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600}
+.sb-footer{margin-top:auto;padding:1rem;border-top:1px solid rgba(255,255,255,.1)}
+.sb-time{font-size:11px;color:rgba(255,255,255,.4);text-align:center}
+.sb-clock{font-size:18px;font-weight:500;color:rgba(255,255,255,.8);text-align:center;margin-bottom:2px}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:2px solid #1A6B3C;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tb-left{display:flex;align-items:center;gap:14px}
+.tb-logos{display:flex;align-items:center;gap:10px}
+.tb-logos img{height:32px;width:auto;object-fit:contain}
+.tb-sep{width:1px;height:28px;background:#E2E8F0}
+.tb-title{font-size:15px;font-weight:600;color:#1A3D28}
+.tb-sub{font-size:11px;color:#718096}
+.toggle{display:flex;background:#F7FAFC;border-radius:8px;padding:3px;gap:3px;border:1px solid #E2E8F0}
+.tbtn{padding:5px 14px;border:none;background:transparent;border-radius:6px;font-size:11px;cursor:pointer;color:#718096;font-family:inherit;font-weight:500}
+.tbtn.on{background:#1A6B3C;color:#fff}
+
+/* CONTENT */
+.content{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem;flex:1}
+
+/* SCORECARDS */
+.contract-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.scorecard{background:#fff;border-radius:12px;padding:1.5rem 1.75rem;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #E2E8F0}
+.sc-stripe{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px 0 0 2px}
+.sc-icon{position:absolute;top:1.25rem;right:1.25rem;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sc-label{font-size:10px;color:#718096;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px}
+.sc-value{font-size:56px;font-weight:300;line-height:1;margin-bottom:8px}
+.sc-ok{color:#1A6B3C}
+.sc-na{color:#A0AEC0}
+.sc-footer{display:flex;align-items:center;justify-content:space-between}
+.sc-contract{font-size:11px;color:#A0AEC0}
+.sc-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-ok{background:#F0FFF4;color:#276749;border:1px solid #C6F6D5}
+.b-na{background:#F7FAFC;color:#718096;border:1px solid #E2E8F0}
+.sc-bar{height:4px;background:#E2E8F0;border-radius:2px;margin-top:12px;overflow:hidden}
+.sc-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
+
+/* KPI MINI */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.kpi{background:#fff;border-radius:10px;padding:.85rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #E2E8F0;border-top:3px solid #1A6B3C}
+.km-lbl{font-size:10px;color:#718096;margin-bottom:4px;font-weight:500}
+.km-val{font-size:18px;font-weight:600;color:#1A3D28;margin-bottom:2px}
+.km-dev{font-size:10px;font-weight:500}
+.red{color:#E53E3E}.grn{color:#1A6B3C}.gry{color:#A0AEC0}
+
+/* CHARTS */
+.mid-row{display:grid;grid-template-columns:1.6fr 1fr;gap:1rem}
+.card{background:#fff;border-radius:10px;padding:.85rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #E2E8F0}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.card-title{font-size:12px;font-weight:600;color:#1A3D28}
+.card-sub{font-size:10px;color:#A0AEC0}
+.bottom-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.alert-item{display:flex;align-items:flex-start;gap:8px;padding:.4rem 0;border-bottom:1px solid #F7FAFC}
+.alert-item:last-child{border-bottom:none}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.atxt{font-size:11px;color:#4A5568;line-height:1.4;flex:1}
+.atime{font-size:10px;color:#A0AEC0;white-space:nowrap}
+.disp-row{display:flex;align-items:center;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid #F7FAFC}
+.disp-row:last-child{border-bottom:none}
+.disp-mes{font-size:11px;color:#718096}
+.disp-val{font-size:12px;font-weight:700;color:#1A6B3C}
+.map-wrap{background:#EBF5EE;border-radius:8px;height:152px;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sb">
+    <div class="sb-top">
+      <div class="sb-logos">
+        <img src="https://drive.google.com/thumbnail?id=1cPESKqIbFuxPCMbjYM58m1J6oMSQpseE&sz=w100" alt="EBCO">
+        <div class="sb-logos-div"></div>
+        <img src="https://drive.google.com/thumbnail?id=1KXbVMZeHDpLCvn654rTR47t4qr_Bs5uR&sz=w100" alt="Biwo">
+      </div>
+      <div class="sb-park">Santa Inés Sunray</div>
+      <div class="sb-mw">9.23 MW · Biwo Renewables</div>
+    </div>
+    <div class="sb-sec">Principal</div>
+    <div class="sb-it on"><i class="ti ti-dashboard"></i>Resumen</div>
+    <div class="sb-it"><i class="ti ti-chart-bar"></i>Generación</div>
+    <div class="sb-it"><i class="ti ti-activity"></i>Disponibilidad</div>
+    <div class="sb-sec">Gestión</div>
+    <div class="sb-it"><i class="ti ti-file-text"></i>Informes</div>
+    <div class="sb-it"><i class="ti ti-tool"></i>Mantenimiento</div>
+    <div class="sb-it"><i class="ti ti-alert-triangle"></i>Alertas<span class="sb-badge">3</span></div>
+    <div class="sb-sec">Período</div>
+    <div class="sb-it on"><i class="ti ti-calendar"></i>Enero 2026</div>
+    <div class="sb-footer">
+      <div class="sb-clock" id="clock">--:--:--</div>
+      <div class="sb-time" id="clockDate">Cargando...</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-logos">
+          <img src="https://drive.google.com/thumbnail?id=1cPESKqIbFuxPCMbjYM58m1J6oMSQpseE&sz=w200" alt="EBCO Energía" onerror="this.outerHTML='<span style=\'font-size:16px;font-weight:700;color:#1A3D28\'>EBCO Energía</span>'">
+          <div class="tb-sep"></div>
+          <img src="https://drive.google.com/thumbnail?id=1KXbVMZeHDpLCvn654rTR47t4qr_Bs5uR&sz=w200" alt="Biwo Renewables" onerror="this.outerHTML='<span style=\'font-size:16px;font-weight:700;color:#185FA5\'>Biwo Renewables</span>'">
+        </div>
+        <div class="tb-sep"></div>
+        <div>
+          <div class="tb-title">Dashboard O&M Solar</div>
+          <div class="tb-sub">Santa Inés Sunray · Enero 2026</div>
+        </div>
+      </div>
+      <div class="toggle">
+        <button class="tbtn on" onclick="setVista('ebco',this)">Vista EBCO</button>
+        <button class="tbtn" onclick="setVista('biwo',this)">Vista Biwo</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="contract-row">
+        <div class="scorecard">
+          <div class="sc-stripe" style="background:#1A6B3C"></div>
+          <div class="sc-icon" style="background:#F0FFF4"><i class="ti ti-check" style="color:#1A6B3C"></i></div>
+          <div class="sc-label">Disponibilidad mensual</div>
+          <div class="sc-value sc-ok">100%</div>
+          <div class="sc-footer">
+            <div class="sc-contract">Mínimo contractual: 95%</div>
+            <span class="sc-badge b-ok"><i class="ti ti-check" style="font-size:11px"></i> Cumplido</span>
+          </div>
+          <div class="sc-bar"><div class="sc-bar-fill" style="width:100%;background:#1A6B3C"></div></div>
+        </div>
+        <div class="scorecard">
+          <div class="sc-stripe" style="background:#A0AEC0"></div>
+          <div class="sc-icon" style="background:#F7FAFC"><i class="ti ti-info-circle" style="color:#A0AEC0"></i></div>
+          <div class="sc-label">Performance Ratio (PR)</div>
+          <div class="sc-value sc-na">N/A</div>
+          <div class="sc-footer">
+            <div class="sc-contract">Restricción red — fuerza mayor</div>
+            <span class="sc-badge b-na">FM activa</span>
+          </div>
+          <div class="sc-bar"><div class="sc-bar-fill" style="width:90%;background:#CBD5E0"></div></div>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="km-lbl">Energía generada</div>
+          <div class="km-val">1.919 MWh</div>
+          <div class="km-dev red">▼ -20.2% vs estimado</div>
+        </div>
+        <div class="kpi">
+          <div class="km-lbl">Insolación</div>
+          <div class="km-val">263.4 kWh/m²</div>
+          <div class="km-dev red">▼ -21.1% vs estimado</div>
+        </div>
+        <div class="kpi">
+          <div class="km-lbl">Factor de planta prom.</div>
+          <div class="km-val">28.3%</div>
+          <div class="km-dev gry">Desv. estándar: 1.57%</div>
+        </div>
+      </div>
+
+      <div class="mid-row">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Generación diaria vs insolación</div>
+            <div class="card-sub">Días anómalos en rojo</div>
+          </div>
+          <div style="position:relative;width:100%;height:145px">
+            <canvas id="genChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Ubicación del parque</div>
+            <div class="card-sub">Región del Maule</div>
+          </div>
+          <div class="map-wrap" id="mapWrap">
+            <div id="mapSvg" style="width:100%;height:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Energía real vs estimada</div></div>
+          <div style="position:relative;width:100%;height:105px">
+            <canvas id="prChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Alertas del mes</div></div>
+          <div class="alert-item">
+            <div class="adot" style="background:#E53E3E"></div>
+            <div class="atxt">Días 8/9/10 sin generación — EF1+</div>
+            <div class="atime">Ene 8–10</div>
+          </div>
+          <div class="alert-item">
+            <div class="adot" style="background:#D69E2E"></div>
+            <div class="atxt">Potencia limitada 90% — FM</div>
+            <div class="atime">Permanente</div>
+          </div>
+          <div class="alert-item">
+            <div class="adot" style="background:#1A6B3C"></div>
+            <div class="atxt">Falla TK-123 resuelta en terreno</div>
+            <div class="atime">Ene 23</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Disponibilidad histórica</div></div>
+          <div class="disp-row"><div class="disp-mes">Oct 2025</div><div class="disp-val">100.0%</div></div>
+          <div class="disp-row"><div class="disp-mes">Nov 2025</div><div class="disp-val">100.0%</div></div>
+          <div class="disp-row"><div class="disp-mes">Dic 2025</div><div class="disp-val">100.0%</div></div>
+          <div class="disp-row"><div class="disp-mes">Ene 2026</div><div class="disp-val">100.0%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+// Reloj en tiempo real
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('es-CL');
+  document.getElementById('clockDate').textContent=now.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'});
+}
+updateClock();setInterval(updateClock,1000);
+
+function setVista(v,btn){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+const dias=Array.from({length:31},(_,i)=>i+1);
+const energia=[78.6,71.0,66.7,28.9,24.1,67.5,69.5,3.1,0.0,0.0,68.0,38.5,60.8,82.1,80.4,81.5,76.7,80.3,79.4,74.5,78.1,76.7,75.2,77.3,47.5,77.6,69.8,77.6,77.0,59.9,70.8];
+const insol=[10.7,9.1,8.6,3.2,2.7,8.9,9.1,0.3,0.0,0.0,11.5,7.8,8.7,11.2,11.0,11.4,10.6,11.1,10.8,9.9,10.4,10.4,10.2,10.4,6.0,10.6,9.4,10.9,10.5,8.3,9.8];
+const anomalos=[5,8,9,10];
+const bgColors=energia.map((_,i)=>anomalos.includes(i+1)?'rgba(229,62,62,0.85)':'rgba(26,107,60,0.75)');
+
+new Chart(document.getElementById('genChart'),{
+  data:{labels:dias,datasets:[
+    {type:'bar',data:energia,backgroundColor:bgColors,borderRadius:3,yAxisID:'y'},
+    {type:'line',data:insol,borderColor:'#D69E2E',borderWidth:2,pointRadius:0,fill:false,yAxisID:'y2',borderDash:[4,3]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:8},color:'#A0AEC0',maxTicksLimit:10}},
+      y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:8},color:'#A0AEC0'},position:'left'},
+      y2:{grid:{display:false},ticks:{font:{size:8},color:'#D69E2E'},position:'right'}
+    }
+  }
+});
+
+new Chart(document.getElementById('prChart'),{
+  type:'bar',
+  data:{labels:['Oct','Nov','Dic','Ene'],datasets:[
+    {data:[93.7,88.1,93.7,79.8],backgroundColor:'rgba(26,107,60,0.75)',borderRadius:4},
+    {type:'line',data:[95,95,95,95],borderColor:'#E53E3E',borderDash:[4,3],borderWidth:1.5,pointRadius:0,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:9},color:'#A0AEC0'}},
+      y:{min:60,max:105,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:8},color:'#A0AEC0',callback:v=>v+'%'}}
+    }
+  }
+});
+
+d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world=>{
+  const el=document.getElementById('mapWrap');
+  const w=el.offsetWidth||220,h=152;
+  const svg=d3.select('#mapSvg').append('svg').attr('width',w).attr('height',h);
+  const proj=d3.geoMercator().center([-71,-35.5]).scale(950).translate([w/2,h/2]);
+  const path=d3.geoPath(proj);
+  svg.selectAll('path').data(topojson.feature(world,world.objects.countries).features).join('path')
+    .attr('d',path)
+    .attr('fill',d=>d.id==='152'?'#C6F6D5':'#EBF5EE')
+    .attr('stroke','#fff').attr('stroke-width',0.5);
+  const[cx,cy]=proj([-71.6,-35.4]);
+  svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',6).attr('fill','#1A6B3C').attr('stroke','#fff').attr('stroke-width',2);
+  svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',11).attr('fill','none').attr('stroke','#1A6B3C').attr('stroke-width',1).attr('opacity',0.4);
+  svg.append('text').attr('x',cx+14).attr('y',cy+4).attr('font-size','10px').attr('fill','#1A3D28').attr('font-weight','600').text('Santa Inés');
+});
+</script>
+</body>
+</html>
